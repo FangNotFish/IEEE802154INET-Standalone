@@ -21,6 +21,7 @@
 #define IEEE_802154_ENUM_H
 
 enum PIBMsgTypes {
+    INVALID_PIB_MSG_TYPE = -1,
     SETTRXSTATE = 0,
     GET,
     SET,
@@ -115,6 +116,7 @@ inline const char* PhyPIB_StatusToString(PhyPIB_Status z)
 }
 
 enum mlmeRequestTypes {
+    INVALID_MLME_REQUEST_TYPE = -1,
     MLMEASSOCIATE       = 5,
     MLMEDISASSOCIATE    = 6,
     MLMEGET             = 7,

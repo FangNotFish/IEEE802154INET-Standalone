@@ -325,8 +325,8 @@ class IEEE802154Mac : public cSimpleModule, public INotifiable
         cMessage* selfMsg;
 
         // Message Types
-        std::map<std::string, PIBMsgTypes> mappedMsgTypes;
-        std::map<std::string, mlmeRequestTypes> mappedMlmeRequestTypes;
+        // std::map<std::string, PIBMsgTypes> mappedMsgTypes;
+        // std::map<std::string, mlmeRequestTypes> mappedMlmeRequestTypes;
 
         // Variables used for channel scanning
         ScanType scanType; // see IEEE802154Enum.h
@@ -685,5 +685,8 @@ class IEEE802154Mac : public cSimpleModule, public INotifiable
         // incoming PAN descriptor transmitted used by devices (TBD)
         PAN_ELE rxPanDescriptor;
 };
+
+PIBMsgTypes nameToPIBMsgTypes(const std::string& name);
+mlmeRequestTypes nameToMLMERequestTypes(const std::string& name);
 
 #endif /* MAC_H_ */

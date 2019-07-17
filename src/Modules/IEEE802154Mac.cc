@@ -21,16 +21,11 @@
 
 Define_Module(IEEE802154Mac);
 
-void IEEE802154Mac::initialize(int stage)
-{
-    cSimpleModule::initialize(stage);
-    if (stage == 0)
-    {
-        // initialize the debug output bool from NED parameter value
-        macDebug = (hasPar("macDebug") ? (par("macDebug").boolValue()) : (false));
+static std::map<std::string, PIBMsgTypes> mappedMsgTypes;
+static std::map<std::string, mlmeRequestTypes> mappedMlmeRequestTypes;
 
-        macEV << "Initializing Stage 0 \n";
-
+static struct Internal_MappedInitializer {
+  Internal_MappedInitializer() {
         // all Confirm Message types which could come in from the lower layer
         mappedMsgTypes["PLME-SET-TRX-STATE.confirm"] = SETTRXSTATE;
         mappedMsgTypes["PLME-GET.confirm"] = GET;
@@ -53,6 +48,35 @@ void IEEE802154Mac::initialize(int stage)
         mappedMlmeRequestTypes["MLME-SET.request"] = MLMESET;
         mappedMlmeRequestTypes["MLME-ASSOCIATE.response"] = MLMEASSOCIATERESP;
         mappedMlmeRequestTypes["MLME-ORPHAN.response"] = MLMEORPHANRESP;
+  }
+} gInternal_MappedInitializer;
+
+
+PIBMsgTypes nameToPIBMsgTypes(const std::string& name) {
+    auto it = mappedMsgTypes.find(name);
+    if (it != mappedMsgTypes.end()) {
+        return it->second;
+    }
+    return INVALID_PIB_MSG_TYPE;
+}
+
+mlmeRequestTypes nameToMLMERequestTypes(const std::string& name) {
+    auto it = mappedMlmeRequestTypes.find(name);
+    if (it != mappedMlmeRequestTypes.end()) {
+        return it->second;
+    }
+    return INVALID_MLME_REQUEST_TYPE;
+}
+
+void IEEE802154Mac::initialize(int stage)
+{
+    cSimpleModule::initialize(stage);
+    if (stage == 0)
+    {
+        // initialize the debug output bool from NED parameter value
+        macDebug = (hasPar("macDebug") ? (par("macDebug").boolValue()) : (false));
+
+        macEV << "Initializing Stage 0 \n";
 
         syncLoss = false;
         scanning = false;
@@ -649,7 +673,7 @@ void IEEE802154Mac::handleUpperMsg(cMessage *msg)
     else
     {
         // Has to be a MLME request Message from higher layer
-        switch (mappedMlmeRequestTypes[msg->getName()])
+        switch (nameToMLMERequestTypes(msg->getName()))
         {
             case MLMEASSOCIATE: {
                 if (isCoordinator)
@@ -1185,13 +1209,14 @@ void IEEE802154Mac::handleUpperMCPSMsg(cMessage* msg)
 // handle messages received from PHY via PLME-SAP
 void IEEE802154Mac::handleLowerPLMEMsg(cMessage* msg)
 {
-    if (mappedMsgTypes[msg->getName()] == CCA)
+    auto msgName = msg->getName();
+    if (nameToPIBMsgTypes(msgName) == CCA)
     {
         handle_PLME_CCA_confirm((phyState) msg->getKind());
         delete (msg);   // XXX fix for undisposed objects
         return;
     }
-    else if ((mappedMsgTypes[msg->getName()] == ED) && (dynamic_cast<edConf*>(msg)))
+    else if ((nameToPIBMsgTypes(msgName) == ED) && (dynamic_cast<edConf*>(msg)))
     {
         edConf* edConfirmation = check_and_cast<edConf*>(msg);
         if (scanning)
@@ -1205,17 +1230,17 @@ void IEEE802154Mac::handleLowerPLMEMsg(cMessage* msg)
         }
         return;
     }
-    else if ((mappedMsgTypes[msg->getName()] == GET) && (dynamic_cast<GetConfirm*>(msg)))
+    else if ((nameToPIBMsgTypes(msgName) == GET) && (dynamic_cast<GetConfirm*>(msg)))
     {
         handle_PLME_GET_confirm(msg);
         return;
     }
-    else if ((mappedMsgTypes[msg->getName()] == SET) && (dynamic_cast<SetConfirm*>(msg)))
+    else if ((nameToPIBMsgTypes(msgName) == SET) && (dynamic_cast<SetConfirm*>(msg)))
     {
         handle_PLME_SET_confirm(msg);
         return;
     }
-    else if ((!msg->isPacket()) && (mappedMsgTypes[msg->getName()] == SETTRXSTATE))
+    else if ((!msg->isPacket()) && (nameToPIBMsgTypes(msgName) == SETTRXSTATE))
     {
         handle_PLME_SET_TRX_STATE_confirm((phyState) msg->getKind());
         delete (msg);   // XXX fix for undisposed objects
@@ -1301,7 +1326,7 @@ void IEEE802154Mac::handleLowerPDMsg(cMessage* msg)
         delete (msg); // XXX fix for undisposed objects
         return;
     } // if (dynamic_cast<AckFrame*>)
-    else if (mappedMsgTypes[msg->getName()] == CONF)
+    else if (nameToPIBMsgTypes(msg->getName()) == CONF)
     {
         handle_PD_DATA_confirm((phyState) msg->getKind());
         delete (msg); // XXX fix for undisposed objects (PD-DATA.confirm)
