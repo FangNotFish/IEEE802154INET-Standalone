@@ -44,10 +44,10 @@ class MacPIB
         void setMacBattLifeExt(bool status);
         unsigned short getMacBattLifeExtPeriods();
         void setMacBattLifeExtPeriods(unsigned short val);
-        std::vector<unsigned char> getMacBeaconPayload();
-        void setMacBeaconPayload(std::vector<unsigned char> payload);
+        cPacket* getMacBeaconPayload();
+        void setMacBeaconPayload(cPacket* payload);
         unsigned short getMacBeaconPayloadLength();
-        void setMacBeaconPayloadLength(unsigned short val);
+        // void setMacBeaconPayloadLength(unsigned short val);
         unsigned short getMacBeaconOrder();
         void setMacBeaconOrder(unsigned short val);
         simtime_t getMacBeaconTxTime();
@@ -117,8 +117,8 @@ class MacPIB
          summed together and rounded up (if necessary) to an integer number of backoff periods.
          */
 
-        std::vector<unsigned char> macBeaconPayload; // MAXPhyPAcketsize - MaxBeaconOverhead = 52 maximum Octets
-        unsigned short macBeaconPayloadLength; // length in Octets -> Range 0 - 6
+        cPacket* macBeaconPayload; // MAXPhyPAcketsize - MaxBeaconOverhead = 52 maximum Octets
+        // unsigned short macBeaconPayloadLength; // length in Octets -> Range 0 - 6
 
         /*
          * Specification of how often the coordinator transmits its beacon.

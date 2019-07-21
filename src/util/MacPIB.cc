@@ -25,7 +25,7 @@ MacPIB::MacPIB()
     macAutoRequest = true;
     macBattLifeExt = false;
     macBattLifeExtPeriods = 6; // no real default value given just putting it in range
-    macBeaconPayloadLength = 0;
+    // macBeaconPayloadLength = 0;
     macBeaconTxTime = 0;
     macBeaconOrder = 0;
     macBSN = 0;
@@ -118,32 +118,36 @@ void MacPIB::setMacBattLifeExtPeriods(unsigned short val)
     }
 }
 
-std::vector<unsigned char> MacPIB::getMacBeaconPayload()
+cPacket* MacPIB::getMacBeaconPayload()
 {
     return macBeaconPayload;
 }
 
-void MacPIB::setMacBeaconPayload(std::vector<unsigned char> payload)
+void MacPIB::setMacBeaconPayload(cPacket* payload)
 {
-    macBeaconPayload = payload;
+    if (payload->getByteLength() <= 52) {
+        macBeaconPayload = payload;
+    } else {
+        throw cRuntimeError("[802154MAC-PIB]: Assigned BeaconPayload's Length is not in Range");
+    }
 }
 
 unsigned short MacPIB::getMacBeaconPayloadLength()
 {
-    return macBeaconPayloadLength;
+    return macBeaconPayload ? macBeaconPayload->getByteLength() : 0;
 }
 
-void MacPIB::setMacBeaconPayloadLength(unsigned short val)
-{
-    if (val < 7)
-    {
-        macBeaconPayloadLength = val;
-    }
-    else
-    {
-        throw cRuntimeError("[802154MAC-PIB]: Assigned BeaconPayloadLength is not in Range");
-    }
-}
+// void MacPIB::setMacBeaconPayloadLength(unsigned short val)
+// {
+//     if (val < 7)
+//     {
+//         macBeaconPayloadLength = val;
+//     }
+//     else
+//     {
+//         throw cRuntimeError("[802154MAC-PIB]: Assigned BeaconPayloadLength is not in Range");
+//     }
+// }
 
 unsigned short MacPIB::getMacBeaconOrder()
 {
