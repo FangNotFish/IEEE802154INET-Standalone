@@ -1767,7 +1767,7 @@ void IEEE802154Mac::handleCommand(mpdu* frame)
             if (isCoordinator)
             {
                 AssoCmdreq* tmpAssoReq = check_and_cast<AssoCmdreq*>(cmdFrame);
-                Association* assoInd = new Association("MLME-Associate.indication");
+                Association* assoInd = new Association("MLME-ASSOCIATE.indication");
                 assoInd->setAddr(tmpAssoReq->getSrc());
                 assoInd->setCapabilityInformation(tmpAssoReq->getCapabilityInformation());
 
@@ -2934,14 +2934,14 @@ void IEEE802154Mac::genScanConf(ScanStatus status)
 
 void IEEE802154Mac::genPollConf(MACenum status)
 {
-    PollConfirm* pollConf = new PollConfirm("MLME-POLL.confirmation");
+    PollConfirm* pollConf = new PollConfirm("MLME-POLL.confirm");
     pollConf->setStatus(status);
     send(pollConf, "outMLME");
 }
 
 void IEEE802154Mac::genStartConf(MACenum status)
 {
-    StartConfirm* startConf = new StartConfirm("MLME-START.confirmation");
+    StartConfirm* startConf = new StartConfirm("MLME-START.confirm");
     startConf->setStatus(status);
     send(startConf, "outMLME");
 }
