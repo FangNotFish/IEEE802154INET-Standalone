@@ -4271,7 +4271,9 @@ unsigned char IEEE802154Mac::calcFrameByteLength(cPacket* frame)
         {
             // 802.15.4-2006 Specs Fig 44: MHR + Payload (variable) + FCS (2)
             // TODO Beacon MAC payload size depends on GTS fields and pending address fields
-            byteLength = MHRLength + 6 + 2;
+            byteLength = MHRLength + 6 + mpib.getMacBeaconPayloadLength() + 2;
+            if (mpib.getMacBeaconPayload())
+                frame->encapsulate(mpib.getMacBeaconPayload());
         }
         else if (frmType == Data)
         {

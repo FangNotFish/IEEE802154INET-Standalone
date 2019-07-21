@@ -159,6 +159,9 @@ class IEEE802154Mac : public cSimpleModule, public INotifiable
         /** @brief Counter to go through device list for setting up destination address since we have no real application */
         int counter;
 
+        const MacPIB& getMacPIB() const { return mpib; }
+        MacPIB& getMacPIB() { return mpib; }
+
     protected:
         /** @brief Debug output switch for the IEEE 802.15.4 MAC module */
         bool macDebug = false;
